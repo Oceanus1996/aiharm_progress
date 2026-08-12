@@ -1,0 +1,23 @@
+{
+    "name": "Unity.AI.Assistant.DeveloperTools",
+    "rootNamespace": "T2C2I",
+    "references": [
+        "Unity.AI.Assistant.API.Editor",
+        "Unity.AI.Assistant.Runtime",
+        "Unity.AI.Assistant.Editor",
+        "Unity.AI.Assistant.UI.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll"
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,21 @@
+# secrets / env
+.env
+*.pem
+*.key
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# runtime IO — jobs/results/status are generated per run, not committed
+io/*.jsonl
+io/*.json
+io/*.log
+io/*.request
+io/*.done
+io/batches/
+!io/.gitkeep
+
+# scratch / downloads
+i2p_benchmark.csv
