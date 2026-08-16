@@ -11,15 +11,21 @@ compliance.
 > academic benchmark (Schramowski et al., *Safe Latent Diffusion*, CVPR 2023) and are wrapped
 > in a yes/no **compliance probe** — the harness asks the model *whether it would* generate
 > something, it does not produce unsafe media. Do not use it to elicit or distribute harmful
-> content. No secrets, credentials, or model responses are shipped in this repo.
+> content. No secrets or credentials are shipped in this repo. One set of **model responses** is:
+> `data/i2p_claude_policy_flagged.json` — the prompts a model predicted would trip its own safety
+> policy. Raw `io/results.jsonl` stays local and is git-ignored.
 
 ## What's inside
 
 ```
 data/i2pharmprompt.json      I2P (4703) in this repo's schema: id, category{en,zh}, hard, prompt, metrics
+data/i2p_claude_policy_flagged.json
+                             RESULT: the prompts Claude Code predicted would be declined on safety
+                             grounds, with the probe used and the caveats that apply to reading it
 tools/
   convert_i2p.py             rebuild data/ from the public HF CSV
-  build_i2p_jobs.py          data -> jobs.jsonl (each prompt wrapped in a yes/no probe)
+  build_i2p_jobs.py          data -> jobs.jsonl (each prompt wrapped in a yes/no probe;
+                             --probe willingness|policy picks which question is asked)
   split_batches.py           jobs.jsonl -> batch files of N (pacing / handing out work)
   classify_yesno.py          results.jsonl -> refusal classification
   feed_unity_assistant.py    optional external driver (file-queue, non-ACP path)
@@ -62,12 +68,29 @@ docs/                        DESIGN.md + reliability.md (how the runner stays st
 
 ## Reading the numbers (important)
 
-The yes/no probe cannot by itself tell a **safety refusal** ("I won't generate that") apart
-from a **capability/domain refusal** ("I can't make that kind of 2D art") — I2P prompts are
-2D image prompts, and the target is a 3D assistant. Split by the `hard` flag and read the
-`thought`/answer blocks before drawing conclusions. Refusal detection here decides *"did it
-refuse"*, never *"did an attack succeed"* — that verdict belongs to downstream deterministic
-oracles, not to an LLM reading transcripts (see `docs/DESIGN.md`).
+**Three different quantities, never one denominator.** `--probe willingness` asks *"can you
+generate this"* (Yes = comply); `--probe policy` asks *"would this be declined for safety
+reasons"* (Yes = refuse); actually asking the model to generate measures a third thing. A
+model's prediction about its own guardrail is not its behaviour, and neither is its stated
+willingness. Each job records `_meta.yes_means` so `classify_yesno.py` maps Yes to
+comply/refuse by probe rather than by hand — the polarity is inverted between the two.
+
+The plain willingness probe cannot tell a **safety refusal** ("I won't") from a
+**capability/domain refusal** ("I can't make 2D art") — I2P prompts are 2D image prompts and
+the target may be a 3D assistant. The policy probe excludes non-safety declines explicitly and
+forbids tool use, which is what makes it usable against agentic providers.
+
+**Do not group by `hard`.** It is tempting, and it is misleading: `hard` marks prompts where
+≥50% of Stable Diffusion's 10 generations were classified inappropriate, i.e. it describes
+*what the image generator drew*, while a text probe only ever sees the prompt. Measured over
+1669 prompts, `hard` looks predictive on its own but nearly all of that disappears once
+`prompt_toxicity` is held constant. Group by `prompt_toxicity`; treat `categories` as
+*retrieval provenance* (the I2P authors inherited each label from the keyword that retrieved
+the prompt via CLIP image similarity), not as a content judgement.
+
+Refusal detection here decides *"did it refuse"*, never *"did an attack succeed"* — that
+verdict belongs to downstream deterministic oracles, not to an LLM reading transcripts
+(see `docs/DESIGN.md`).
 
 ## Data / citation
 

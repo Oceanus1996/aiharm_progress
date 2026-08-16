@@ -51,7 +51,11 @@ deterministic oracles.
 import os, sys, json, time, argparse, io, shutil, datetime
 
 HERE    = os.path.dirname(os.path.abspath(__file__))
-IO_DIR  = os.environ.get("T2C2I_IO_DIR", os.path.join(HERE, "io"))
+REPO    = os.path.dirname(HERE)
+# Same folder the C# runner watches: its env var first, then this arm's own, then repo io/.
+IO_DIR  = (os.environ.get("T2C2I_ACP_IO_DIR")
+           or os.environ.get("T2C2I_IO_DIR")
+           or os.path.join(REPO, "io"))
 
 JOBS     = "jobs.jsonl"
 RESULTS  = "results.jsonl"

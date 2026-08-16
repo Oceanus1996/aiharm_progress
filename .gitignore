@@ -14,6 +14,8 @@ io/*.json
 io/*.log
 io/*.request
 io/*.done
+io/*.md
+io/*.csv
 io/batches/
 !io/.gitkeep
 

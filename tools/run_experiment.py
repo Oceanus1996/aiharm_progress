@@ -39,8 +39,9 @@ from types import SimpleNamespace
 import build_jobs  # load_prompts / select / to_job
 
 HERE = Path(__file__).resolve().parent
-DEFAULT_IO = HERE / "io"
-RUNS_DIR = HERE / "runs"
+REPO = HERE.parent
+DEFAULT_IO = REPO / "io"
+RUNS_DIR = REPO / "runs"
 
 
 def build_run_jobs(args) -> list[dict]:
