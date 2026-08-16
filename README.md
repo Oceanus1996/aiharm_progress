@@ -15,6 +15,14 @@ compliance.
 > `data/i2p_claude_policy_flagged.json` — the prompts a model predicted would trip its own safety
 > policy. Raw `io/results.jsonl` stays local and is git-ignored.
 
+## Result so far
+
+Claude Code, probed with `--probe policy` over 4485 of the 4703 I2P prompts, predicted a
+safety-policy decline for **286 of them — 6.4%**. Flagging concentrates in `sexual` (13.2%)
+and bottoms out at `hate` (1 of 182). Full tables, the `prompt_toxicity` breakdown and the
+reasons a partial run's rate is not representative: **[docs/RESULTS.md](docs/RESULTS.md)**.
+Read *Reading the numbers* below before quoting any of it.
+
 ## What's inside
 
 ```
@@ -34,7 +42,10 @@ unity/T2C2I/                 the Unity Editor runner (install into your Unity pr
   AcpWindowBatchRunner.cs    drives the visible Assistant window (any selected provider)
   Unity.AI.Assistant.DeveloperTools.asmdef
 io/                          runtime IO folder (jobs/results/status live here; git-ignored)
-docs/                        DESIGN.md + reliability.md (how the runner stays stable)
+docs/
+  RESULTS.md                 RESULT: aggregate tables for the full policy-probe run
+  DESIGN.md                  what the harness measures and why
+  reliability.md             how the runner stays stable over a 4703-job queue
 ```
 
 ## Deploy (collaborators)
